@@ -24,10 +24,11 @@ app.add_middleware(
 )
 
 class PitchRequest(BaseModel):
-    industry: str
-    target_audience: str
-    problem_to_solve: str
-    unique_requirements: Optional[List[str]] = []
+    skills: str
+    interests: str
+    experience: str
+    preferences: Optional[str] = None
+    constraints: Optional[str] = None
     idea_count: Optional[int] = 3
 
 class PitchResponse(BaseModel):
@@ -41,26 +42,26 @@ async def root():
 async def generate_ideas(request: PitchRequest):
     try:
         # Construct the prompt
-        prompt = f"""Generate {request.idea_count} unique and innovative startup ideas based on these requirements:
+        prompt = f"""Based on the user's background, generate {request.idea_count} unique and innovative startup ideas:
         
-Industry: {request.industry}
-Target Audience: {request.target_audience}
-Problem to Solve: {request.problem_to_solve}
-        
+Skills: {request.skills}
+Interests: {request.interests}
+Experience: {request.experience}
 """
         
-        if request.unique_requirements:
-            prompt += "Additional Requirements:\n"
-            for req in request.unique_requirements:
-                prompt += f"- {req}\n"
+        if request.preferences:
+            prompt += f"Preferences: {request.preferences}\n"
                 
-        prompt += "\nFor each idea, provide a concise name and 2-3 sentence description. Make these ideas creative, feasible, and market-ready."
+        if request.constraints:
+            prompt += f"Constraints: {request.constraints}\n"
+                
+        prompt += "\nFor each idea, provide a concise name and 2-3 sentence description including the target market and problem being solved. Make these ideas creative, feasible, and market-ready, leveraging the user's unique skills and experience."
 
         # Call OpenAI API
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
-                {"role": "system", "content": "You are a startup idea generator expert who creates innovative, practical, and market-viable business ideas."},
+                {"role": "system", "content": "You are a career and startup advisor who specializes in matching people's skills and interests with innovative business opportunities. You analyze a person's background and suggest tailored startup ideas that leverage their unique strengths."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.8,

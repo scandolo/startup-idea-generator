@@ -47,44 +47,41 @@ st.markdown("""
 
 # Header
 st.markdown('<p class="main-header">PitchSlap</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Generate unique startup ideas with AI</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Generate startup ideas tailored to your skills and experiences</p>', unsafe_allow_html=True)
 
 # Create a form for input
 with st.form("pitch_form"):
     col1, col2 = st.columns(2)
     
     with col1:
-        industry = st.text_input("Industry", placeholder="Tech, Healthcare, Finance, etc.")
-        target_audience = st.text_input("Target Audience", placeholder="Millennials, Small Business Owners, etc.")
+        skills = st.text_area("Your Skills", placeholder="Programming languages, design, marketing, communication skills, etc.")
+        interests = st.text_area("Your Interests", placeholder="What topics, industries, or activities are you passionate about?")
     
     with col2:
-        problem_to_solve = st.text_area("Problem to Solve", placeholder="Describe the problem your startup should address")
+        experience = st.text_area("Your Experience", placeholder="Previous work, projects, or relevant background")
         idea_count = st.slider("Number of Ideas to Generate", min_value=1, max_value=5, value=3)
     
-    # Expandable section for additional requirements
-    with st.expander("Additional Requirements (Optional)"):
-        req1 = st.text_input("Requirement 1", placeholder="e.g., Must be mobile-first")
-        req2 = st.text_input("Requirement 2", placeholder="e.g., Include subscription model")
-        req3 = st.text_input("Requirement 3", placeholder="e.g., Low initial investment")
+    # Expandable section for additional preferences
+    with st.expander("Additional Information (Optional)"):
+        preferences = st.text_area("Preferences", placeholder="e.g., Remote-friendly, low startup costs, B2B focus, etc.")
+        constraints = st.text_area("Constraints", placeholder="e.g., Limited funding, time constraints, geographic limitations")
     
-    submit_button = st.form_submit_button("Generate Ideas! 💡")
+    submit_button = st.form_submit_button("Generate Personalized Ideas! 💡")
 
 # Process form submission
 if submit_button:
-    if not industry or not target_audience or not problem_to_solve:
-        st.error("Please fill in all required fields: Industry, Target Audience, and Problem to Solve.")
+    if not skills or not interests or not experience:
+        st.error("Please fill in all required fields: Skills, Interests, and Experience.")
     else:
         # Show loading spinner
-        with st.spinner("Generating brilliant startup ideas..."):
-            # Prepare requirements list (excluding empty ones)
-            requirements = [req for req in [req1, req2, req3] if req]
-            
+        with st.spinner("Generating startup ideas tailored to your background..."):
             # Prepare request payload
             payload = {
-                "industry": industry,
-                "target_audience": target_audience,
-                "problem_to_solve": problem_to_solve,
-                "unique_requirements": requirements,
+                "skills": skills,
+                "interests": interests,
+                "experience": experience,
+                "preferences": preferences if preferences else None,
+                "constraints": constraints if constraints else None,
                 "idea_count": idea_count
             }
             
@@ -96,7 +93,7 @@ if submit_button:
                 data = response.json()
                 
                 # Display results
-                st.success(f"Generated {len(data['ideas'])} startup ideas!")
+                st.success(f"Generated {len(data['ideas'])} personalized startup ideas!")
                 
                 for i, idea in enumerate(data['ideas']):
                     with st.container():
